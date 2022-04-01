@@ -15,7 +15,7 @@ function mat4x4Parallel(prp, srp, vup, clip) {
     var rVRC = new Matrix(4, 4);
     Mat4x4RotateVRC(rVRC, prp, srp, vup);
 
-    var cw = new Vector3((clip[0] + c[1])/2, (c[2] + c[3])/2, -c[4]);
+    var cw = new Vector3((clip[0] + clip[1])/2, (clip[2] + clip[3])/2, -clip[4]);
     var dop = cw.subtract(prp);
     var shPar = new Matrix(4, 4);
     Mat4x4ShearXY(shPar, -dop.x/dop.z, -dop.y/dop.z);
@@ -24,7 +24,7 @@ function mat4x4Parallel(prp, srp, vup, clip) {
     Mat4x4Translate(tPar, 0, 0, c[4]);
 
     var sPar = new Matrix(4, 4);
-    Mat4x4Scale(sPar, 2/(c[1] - c[0]), 2/(c[3] - c[2]), 1/c[5]);
+    Mat4x4Scale(sPar, 2/(clip[1] - clip[0]), 2/(clip[3] - clip[2]), 1/clip[5]);
     
     return Matrix.multiply([sPar, tPar, shPar, rVRC, tPRP]);
 }
@@ -45,13 +45,13 @@ function mat4x4Perspective(prp, srp, vup, clip) {
     var rVRC = new Matrix(4, 4);
     Mat4x4RotateVRC(rVRC, prp, srp, vup);
 
-    var cw = new Vector3((clip[0] + c[1])/2, (c[2] + c[3])/2, -c[4]);
+    var cw = new Vector3((clip[0] + clip[1])/2, (clip[2] + clip[3])/2, -clip[4]);
     var dop = cw.subtract(prp);
     var shPar = new Matrix(4, 4);
     Mat4x4ShearXY(shPar, -dop.x/dop.z, -dop.y/dop.z);
 
     var sPer = new Matrix(4, 4);
-    Mat4x4Scale(sPer, 2 * c[4] / ((c[1] - c[0]) * c[5]), 2 * c[4] / ((c[3] - c[2]) * c[5]), 1 / c[5]);
+    Mat4x4Scale(sPer, 2 * clip[4] / ((clip[1] - clip[0]) * clip[5]), 2 * clip[4] / ((clip[3] - clip[2]) * clip[5]), 1 / clip[5]);
 
     return Matrix.multiply([sPer, shPar, rVRC, tPRP]);
 }
