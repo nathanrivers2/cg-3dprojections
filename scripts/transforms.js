@@ -1,7 +1,10 @@
 // create a 4x4 matrix to the parallel projection / view matrix
 function mat4x4Parallel(prp, srp, vup, clip) {
     // 1. translate PRP to origin
-    // 2. rotate VRC such that (u,v,n) align with (x,y,z)
+    let translation = new Matrix(4,4); 
+    Mat4x4Translate(translation,prp.x,prp.y,prp.z); 
+    // 2. rotate VRC such that (u,v,n) align with (x,y,z) 
+    
     // 3. shear such that CW is on the z-axis
     // 4. translate near clipping plane to origin
     // 5. scale such that view volume bounds are ([-1,1], [-1,1], [-1,0])
@@ -49,7 +52,6 @@ function mat4x4Identity(mat4x4) {
                      [0, 1, 0, 0],
                      [0, 0, 1, 0],
                      [0, 0, 0, 1]]; 
-                     //this is not right need to multiply the input matrix by this matrix
 }
 
 // set values of existing 4x4 matrix to the translate matrix
@@ -59,8 +61,6 @@ function Mat4x4Translate(mat4x4, tx, ty, tz) {
                      [0,0,1,tz], 
                      [0,0,0,1]];
 
-
-                    //this is not right need to multiply the input matrix by this matrix
 }
 
 // set values of existing 4x4 matrix to the scale matrix
@@ -70,7 +70,7 @@ function Mat4x4Scale(mat4x4, sx, sy, sz) {
                      [0,0,sz,0], 
                      [0,0,0,1]];
 
-}//this is not right need to multiply the input matrix by this matrix
+}
 
 // set values of existing 4x4 matrix to the rotate about x-axis matrix
 function Mat4x4RotateX(mat4x4, theta) {
