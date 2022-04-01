@@ -48,7 +48,8 @@ function mat4x4Identity(mat4x4) {
     mat4x4.values = [[1, 0, 0, 0],
                      [0, 1, 0, 0],
                      [0, 0, 1, 0],
-                     [0, 0, 0, 1]];
+                     [0, 0, 0, 1]]; 
+                     //this is not right need to multiply the input matrix by this matrix
 }
 
 // set values of existing 4x4 matrix to the translate matrix
@@ -57,6 +58,9 @@ function Mat4x4Translate(mat4x4, tx, ty, tz) {
                      [0,1,0,ty], 
                      [0,0,1,tz], 
                      [0,0,0,1]];
+
+
+                    //this is not right need to multiply the input matrix by this matrix
 }
 
 // set values of existing 4x4 matrix to the scale matrix
@@ -65,14 +69,15 @@ function Mat4x4Scale(mat4x4, sx, sy, sz) {
                      [0,sy,0,0], 
                      [0,0,sz,0], 
                      [0,0,0,1]];
-}
+
+}//this is not right need to multiply the input matrix by this matrix
 
 // set values of existing 4x4 matrix to the rotate about x-axis matrix
 function Mat4x4RotateX(mat4x4, theta) {
     mat4x4.values = [[0,0,0,0], 
                      [0,0,0,0], 
                      [0,0,0,0], 
-                     [0,0,0,0]];
+                     [0,0,0,0]]; 
 }
 
 // set values of existing 4x4 matrix to the rotate about y-axis matrix

@@ -93,6 +93,7 @@ function drawScene() {
     //  * clip in 3D
     //  * project to 2D
     //  * draw line
+  
 }
 
 // Get outcode for vertex (parallel view volume)
