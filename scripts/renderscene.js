@@ -150,7 +150,45 @@ function clipLineParallel(line) {
     let p1 = Vector3(line.pt1.x, line.pt1.y, line.pt1.z);
     let out0 = outcodeParallel(p0);
     let out1 = outcodeParallel(p1);
-    
+
+    while(true) {
+        if(!(out0 | out1)) {
+            result = line;
+            break;
+        } else if(out0 & out1) {
+            result = null;
+            break;
+        } else {
+            let outCode = out0 > out1 ? out0 : out1;
+            let t;
+
+            if(outCode & LEFT) {
+                t = (-1 - p0.x)/(p1.x - p0.x);
+            } else if(outCode & RIGHT) {
+                t = (1 - p0.x)/(p1.x - p0.x);
+            } else if(outCode & BOTTOM) {
+                t = (-1 - p0.y)/(p1.y-p0.y);
+            } else if(outCode & TOP) {
+                t = (1 - p0.y)/(p1.y-p0.y);
+            } else if(outCode & FAR) {
+                t = (-1 - p0.z)/(p1.z-p0.z);
+            } else if(outCode & NEAR) {
+                t = (0 - p0.z)/(p1.z-p0.z);
+            }
+
+            let xt = p0.x + (p1.x-p0.x)*t;
+            let yt = p0.y + (p1.y-p0.y)*t;
+            let zt = p0.z + (p1.z-p0.z)*t;
+
+            if(outCode == out0) {
+                p0.values = [xt, yt, zt];
+                out0 = outcodeParallel(p0);
+            } else {
+                p1.values = [xt, yt, zt];
+                out1 = outcodeParallel(p1);
+            }
+        }
+    }
     // TODO: implement clipping here!
     
     return result;
@@ -164,7 +202,44 @@ function clipLinePerspective(line, z_min) {
     let out0 = outcodePerspective(p0, z_min);
     let out1 = outcodePerspective(p1, z_min);
     
-    // TODO: implement clipping here!
+    while(true) {
+        if(!(out0 | out1)) {
+            result = line;
+            break;
+        } else if(out0 & out1) {
+            result = null;
+            break;
+        } else {
+            let outCode = out0 > out1 ? out0 : out1;
+            let t;
+
+            if(outCode & LEFT) {
+                t = (-p0.x + p0.z)/((p1.x - p0.x) - (p1.z - p0.z));
+            } else if(outCode & RIGHT) {
+                t = (-p0.x + p0.z)/(-(p1.x - p0.x) - (p1.z - p0.z));
+            } else if(outCode & BOTTOM) {
+                t = (-p0.y + p0.z)/((p1.y - p0.y) - (p1.z - p0.z));                
+            } else if(outCode & TOP) {
+                t = (-p0.y + p0.z)/(-(p1.y - p0.y) - (p1.z - p0.z));                
+            } else if(outCode & FAR) {
+                t = (-p0.z - 1)/(p1.z - p0.z);
+            } else if(outCode & NEAR) {
+                t = (p0.z - z_min)/(-(p1.z - p0.z));
+            }
+
+            let xt = p0.x + (p1.x-p0.x)*t;
+            let yt = p0.y + (p1.y-p0.y)*t;
+            let zt = p0.z + (p1.z-p0.z)*t;
+
+            if(outCode == out0) {
+                p0.values = [xt, yt, zt];
+                out0 = outcodeParallel(p0);
+            } else {
+                p1.values = [xt, yt, zt];
+                out1 = outcodeParallel(p1);
+            }
+        }
+    }
     
     return result;
 }
