@@ -104,51 +104,28 @@ function mat4x4Identity(mat4x4) {
 
 // set values of existing 4x4 matrix to the translate matrix
 function Mat4x4Translate(mat4x4, tx, ty, tz) {
-<<<<<<< HEAD
-    mat4x4.values = [[1,0,0,tx], 
-                     [0,1,0,ty], 
-                     [0,0,1,tz], 
-                     [0,0,0,1]];
-
-=======
     mat4x4.values = [[1, 0, 0, tx],
                      [0, 1, 0, ty],
                      [0, 0, 1, tz],
                      [0, 0, 0, 1]];
->>>>>>> 71dc472fa163083d742c007809d0368f3b3e1c03
 }
 
 // set values of existing 4x4 matrix to the scale matrix
 function Mat4x4Scale(mat4x4, sx, sy, sz) {
-<<<<<<< HEAD
-    mat4x4.values = [[sx,0,0,0], 
-                     [0,sy,0,0], 
-                     [0,0,sz,0], 
-                     [0,0,0,1]];
-
-=======
     mat4x4.values = [[sx, 0, 0, 0],
                      [0, sy, 0, 0],
                      [0, 0, sz, 0],
                      [0, 0, 0, 1]];
->>>>>>> 71dc472fa163083d742c007809d0368f3b3e1c03
 }
 
 // set values of existing 4x4 matrix to the rotate about x-axis matrix
 function Mat4x4RotateX(mat4x4, theta) {
-<<<<<<< HEAD
-    mat4x4.values = [[0,0,0,0], 
-                     [0,0,0,0], 
-                     [0,0,0,0], 
-                     [0,0,0,0]]; 
-=======
     let cos = Math.cos(theta);
     let sin = Math.sin(theta);
     mat4x4.values = [[1,  0,   0,     0],
                      [0, cos, -1*sin, 0],
                      [0, sin, cos,    0],
                      [0, 0,    0,     1]];
->>>>>>> 71dc472fa163083d742c007809d0368f3b3e1c03
 }
 
 // set values of existing 4x4 matrix to the rotate about y-axis matrix
