@@ -214,11 +214,17 @@ function clipLinePerspective(line, z_min) {
             let t;
 
             if(outCode & LEFT) {
+                t = (-p0.x + p0.z)/((p1.x - p0.x) - (p1.z - p0.z));
             } else if(outCode & RIGHT) {
+                t = (-p0.x + p0.z)/(-(p1.x - p0.x) - (p1.z - p0.z));
             } else if(outCode & BOTTOM) {
+                t = (-p0.y + p0.z)/((p1.y - p0.y) - (p1.z - p0.z));                
             } else if(outCode & TOP) {
+                t = (-p0.y + p0.z)/(-(p1.y - p0.y) - (p1.z - p0.z));                
             } else if(outCode & FAR) {
+                t = (-p0.z - 1)/(p1.z - p0.z);
             } else if(outCode & NEAR) {
+                t = (p0.z - z_min)/(-(p1.z - p0.z));
             }
 
             let xt = p0.x + (p1.x-p0.x)*t;
