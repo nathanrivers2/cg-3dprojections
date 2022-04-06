@@ -95,7 +95,10 @@ function drawScene() {
               transformedVerticies.push(Matrix.multiply([perMat,vertVec]));
           }
         }
-      console.log(transformedVerticies);
+    
+      console.log("start of transformed verticies, want all to be between -1 and 1 "); 
+    console.log(transformedVerticies);
+    console.log("end of transformed verticies"); 
       
       //take all transfromed points and clip  
       //zmin = -(near/far)
