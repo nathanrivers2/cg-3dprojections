@@ -67,21 +67,6 @@ function init() {
     window.requestAnimationFrame(animate);
 }
 
-// Animation loop - repeatedly calls rendering code
-function animate(timestamp) {
-    // step 1: calculate time (time since start)
-    let time = timestamp - start_time;
-    
-    // step 2: transform models based on time
-    // TODO: implement this!
-
-    // step 3: draw scene
-    drawScene();
-
-    // step 4: request next animation frame (recursively calling same function)
-    // (may want to leave commented out while debugging initially)
-    // window.requestAnimationFrame(animate);
-}
 
 // Main drawing code - use information contained in variable `scene`
 function drawScene() {
@@ -94,6 +79,67 @@ function drawScene() {
     //  * project to 2D
     //  * draw line
   
+    //for perspective 
+    //if(scene.view.type == 'perspective'){
+      let perMat=mat4x4Perspective(scene.view.prp, scene.view.srp, scene.view.vup, scene.view.clip); 
+      let mPer = mat4x4MPer();
+      let projection = projToWindow(scene.height, scene.width); 
+
+      let transformedVerticies = [];
+      //take all of the points and multiply them the p[erspective matrix to transorm to the canonical view volume
+      for(let i=0; i<scene.models.length; i++){ 
+          for(let j=0; j<scene.models[i].vertices.length; j++){ 
+              let vertVec = new Vector4(); 
+              vertVec.values=[[scene.models[i].vertices[j].x], [scene.models[i].vertices[j].y],
+              [scene.models[i].vertices[j].z], [scene.models[i].vertices[j].w]];
+              transformedVerticies.push(Matrix.multiply([perMat,vertVec]));
+          }
+        }
+      console.log(transformedVerticies);
+      
+      //take all transfromed points and clip  
+      //zmin = -(near/far)
+      let zMin = -(scene.view.clip[4]/scene.view.clip[5]);
+      let clippedVerticies = [];
+      let lines =[];
+  
+      for(let i=0; i<scene.models.length; i++){ 
+        for(let j=0; j<scene.models[i].edges.length; j++){ 
+            for(let k=0; k<scene.models[i].edges[j].length-1; k++){ 
+
+                let pt0= transformedVerticies[scene.models[i].edges[j][k]];
+                let pt1= transformedVerticies[scene.models[i].edges[j][k+1]]; 
+
+                let line = { 
+                    pt0: {x: pt0.data[0], y: pt0.data[1], z: pt0.data[2]}, 
+                    pt1: {x: pt1.data[0], y: pt1.data[1], z: pt1.data[2]}
+                }
+
+                //this is just to look at to see if we have lines we are looking for
+                lines.push(line);
+
+                let clipped = clipLinePerspective(line,zMin); 
+
+                if(clipped != null){ 
+                    //put clipped val into clippedVerticies
+                    clippedVerticies.push(clipped);
+                }else{
+                    //put the og val into clippedVerticies
+                    clippedVerticies.push(line);
+                }
+
+            }
+        }
+      }
+      console.log(clippedVerticies);
+      console.log(lines);  
+
+      //at this point we should have a number of lines which have been transformed and clipped. 
+      //each line has data stored in points. 
+      //extract data from points and create vectors with it. 
+      //multiply those vectors by the mper matrix 
+      //draw line from multiplied point to multiplied point
+
 }
 
 // Get outcode for vertex (parallel view volume)
@@ -245,6 +291,28 @@ function clipLinePerspective(line, z_min) {
     return result;
 }
 
+
+
+
+
+//leave this alone for now
+
+
+// Animation loop - repeatedly calls rendering code
+function animate(timestamp) {
+    // step 1: calculate time (time since start)
+    let time = timestamp - start_time;
+    
+    // step 2: transform models based on time
+    // TODO: implement this!
+
+    // step 3: draw scene
+    drawScene();
+
+    // step 4: request next animation frame (recursively calling same function)
+    // (may want to leave commented out while debugging initially)
+    // window.requestAnimationFrame(animate);
+}
 // Called when user presses a key on the keyboard down 
 function onKeyDown(event) {
     switch (event.keyCode) {
@@ -268,6 +336,22 @@ function onKeyDown(event) {
             break;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ///////////////////////////////////////////////////////////////////////////
 // No need to edit functions beyond this point
