@@ -47,9 +47,10 @@ function mat4x4Perspective(prp, srp, vup, clip) {
     //Center of window: (left+right)/2, (bottom+top)/2
     var cw = new Vector3((clip[0] + clip[1])/2, (clip[2] + clip[3])/2, -clip[4]);
     //DOP: CW - PRP
-    var dop = cw.subtract(prp);
+    var dop = cw;
     var shPar = new Matrix(4, 4);
     Mat4x4ShearXY(shPar, -dop.x/dop.z, -dop.y/dop.z);
+    console.log(shPar)
 
     // 4. scale such that view volume bounds are ([z,-z], [z,-z], [-1,zmin])
     var sPer = new Matrix(4, 4);
@@ -84,7 +85,6 @@ function Mat4x4RotateVRC(mat4x4, prp, srp, vup) {
     //n-axis: normalized(PRP-SRP)
     var n = prp.subtract(srp);
     n.normalize();
-
     //u-axis: normalized(VUP x n-axis)
     var u = vup.cross(n);
     u.normalize();
