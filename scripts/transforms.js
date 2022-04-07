@@ -72,7 +72,7 @@ function mat4x4MPar() {
 // create a 4x4 matrix to project a perspective image on the z=-1 plane
 function mat4x4MPer() {
     let mper = new Matrix(4, 4);
-    mpar.values =   [[1, 0, 0, 0],
+    mper.values =   [[1, 0, 0, 0],
                      [0, 1, 0, 0],
                      [0, 0, 0, 0],
                      [0, 0, -1, 0]];
@@ -80,8 +80,10 @@ function mat4x4MPer() {
 }
 
 function Mat4x4RotateVRC(mat4x4, prp, srp, vup) {
-    var n = prp.subtract(srp).normalize();
-    var u = vup.cross(n).normalize();
+    var n = prp.subtract(srp);
+    n.normalize();
+    var u = vup.cross(n);
+    u.normalize();
     var v = n.cross(u);
     mat4x4.values = [[u.x, u.y, u.z, 0], 
                     [v.x, v.y, v.z, 0], 
