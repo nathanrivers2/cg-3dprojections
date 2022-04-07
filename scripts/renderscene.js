@@ -68,82 +68,102 @@ function init() {
 }
 
 
-// Main drawing code - use information contained in variable `scene`
 function drawScene() {
-    console.log(scene);
-    
     // TODO: implement drawing here!
     // For each model, for each edge
     //  * transform to canonical view volume
     //  * clip in 3D
     //  * project to 2D
     //  * draw line
-  
+
     //for perspective 
-    //if(scene.view.type == 'perspective'){
-      let perMat=mat4x4Perspective(scene.view.prp, scene.view.srp, scene.view.vup, scene.view.clip); 
-      let mPer = mat4x4MPer();
-      let projection = projToWindow(scene.height, scene.width); 
+    if(scene.view.type == 'perspective'){ 
 
-      let transformedVerticies = [];
-      //take all of the points and multiply them the p[erspective matrix to transorm to the canonical view volume
-      for(let i=0; i<scene.models.length; i++){ 
-          for(let j=0; j<scene.models[i].vertices.length; j++){ 
-              let vertVec = new Vector4(); 
-              vertVec.values=[[scene.models[i].vertices[j].x], [scene.models[i].vertices[j].y],
-              [scene.models[i].vertices[j].z], [scene.models[i].vertices[j].w]];
-              transformedVerticies.push(Matrix.multiply([perMat,vertVec]));
-          }
-        }
-    
-      console.log("start of transformed verticies, want all to be between -1 and 1 "); 
-    console.log(transformedVerticies);
-    console.log("end of transformed verticies"); 
-      
-      //take all transfromed points and clip  
-      //zmin = -(near/far)
-      let zMin = -(scene.view.clip[4]/scene.view.clip[5]);
-      let clippedVerticies = [];
-      let lines =[];
-  
-      for(let i=0; i<scene.models.length; i++){ 
-        for(let j=0; j<scene.models[i].edges.length; j++){ 
-            for(let k=0; k<scene.models[i].edges[j].length-1; k++){ 
+        let nPer = mat4x4Perspective(scene.view.prp, scene.view.srp, scene.view.vup, scene.view.clip);
+        let mPer= mat4x4MPer();
+        let edges = [];
+        //for each model
+        for(let i=0; i<scene.models.length; i++){ 
+            //for each edge transform
+            for(let j=0; j<scene.models[i].edges.length-1; j++){ 
+                for(let k=0; k<scene.models[i].edges[j].length-1; k++){ 
+                    //need to get vertex at each index in the exges list and make lines for each pair
+                    let p0Pointer = scene.models[i].vertices[scene.models[i].edges[j][k]];
+                    let p1Pointer = scene.models[i].vertices[scene.models[i].edges[j][k+1]]; 
 
-                let pt0= transformedVerticies[scene.models[i].edges[j][k]];
-                let pt1= transformedVerticies[scene.models[i].edges[j][k+1]]; 
+                    let pt0 = Vector4(p0Pointer.x,p0Pointer.y,p0Pointer.z,p0Pointer.w);
+                    let pt1 = Vector4(p1Pointer.x,p1Pointer.y,p1Pointer.z,p1Pointer.w); 
+                    console.log(pt0);
 
-                let line = { 
-                    pt0: {x: pt0.data[0], y: pt0.data[1], z: pt0.data[2]}, 
-                    pt1: {x: pt1.data[0], y: pt1.data[1], z: pt1.data[2]}
+                    //transform both points to canonical view volume
+                    let tP0 = Matrix.multiply([nPer,pt0]);
+                    let tP1 = Matrix.multiply([nPer,pt1]);
+                   
+
+                    //create line for each set of points
+                    let line = {pt0: tP0, pt1:tP1}; 
+                    edges.push(line);
                 }
-
-                //this is just to look at to see if we have lines we are looking for
-                lines.push(line);
-
-                let clipped = clipLinePerspective(line,zMin); 
-
-                if(clipped != null){ 
-                    //put clipped val into clippedVerticies
-                    clippedVerticies.push(clipped);
-                }else{
-                    //put the og val into clippedVerticies
-                    clippedVerticies.push(line);
-                }
-
             }
         }
-      }
-      console.log(clippedVerticies);
-      console.log(lines);  
+        console.log(edges);
 
-      //at this point we should have a number of lines which have been transformed and clipped. 
-      //each line has data stored in points. 
-      //extract data from points and create vectors with it. 
-      //multiply those vectors by the mper matrix 
-      //draw line from multiplied point to multiplied point
+        //for each edge, clip  
+        let clippedEdges = [];
+        for(let x=0; x<edges.length;x++){ 
+            let clipped = clipLinePerspective(edges[x]); 
 
+            if(clipped != null){ 
+                clippedEdges.push(clipped);
+            }else{ 
+                clippedEdges.push(edges[x]);
+            }
+        }
+        console.log("clipped edges");
+        console.log(clippedEdges);
+
+        //multiply clipped edges by mPer and scale 
+        let V = new Matrix(4,4);
+        V.values= ([view.width/2, 0, 0, view.width/2,
+                0, view.height/2, 0, view.height/2,
+                0, 0, 1, 0,
+                0, 0, 0, 1]);
+
+        for(edge of clippedEdges){ //think this is how you do a for each loop
+                edge.pt0=Matrix.multiply([mPer,edge.pt0]);
+                edge.pt1=Matrix.multiply([mPer,edge.pt1]);
+        }
+
+
+        console.log(clippedEdges);
+
+        for(edge of clippedEdges){ //think this is how you do a for each loop
+                edge.pt0=Matrix.multiply([V,edge.pt0]);
+                edge.pt1=Matrix.multiply([V,edge.pt1]);
+        }
+        console.log("scaled");
+        console.log(clippedEdges);
+
+
+        //divide x and y by w
+        for(edge of clippedEdges){ //think this is how you do a for each loop
+            edge.pt0.x=(edge.pt0.x)/(edge.pt0.w);
+            edge.pt0.y=(edge.pt0.y)/(edge.pt0.w);
+            edge.pt1.x=(edge.pt1.x)/(edge.pt1.w);
+            edge.pt1.y=(edge.pt1.y)/(edge.pt1.w);
+        }
+
+        console.log("draiwng edges");
+        console.log(clippedEdges);
+
+        //then draw each edge
+        for(edge of clippedEdges){ //think this is how you do a for each loop
+            drawLine(edge.pt0.x,edge.pt0.y,edge.pt1.x,edge.pt1.y);
+        }
+
+    }
 }
+
 
 // Get outcode for vertex (parallel view volume)
 function outcodeParallel(vertex) {
@@ -339,21 +359,6 @@ function onKeyDown(event) {
             break;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ///////////////////////////////////////////////////////////////////////////
