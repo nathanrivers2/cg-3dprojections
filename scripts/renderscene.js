@@ -286,7 +286,7 @@ function clipLinePerspective(line, z_min) {
             if(outCode & LEFT) {
                 t = (-p0.x + p0.z)/((p1.x - p0.x) - (p1.z - p0.z));
             } else if(outCode & RIGHT) {
-                t = (-p0.x + p0.z)/(-(p1.x - p0.x) - (p1.z - p0.z));
+                t = (p0.x + p0.z)/(-(p1.x - p0.x) - (p1.z - p0.z));
             } else if(outCode & BOTTOM) {
                 t = (-p0.y + p0.z)/((p1.y - p0.y) - (p1.z - p0.z));                
             } else if(outCode & TOP) {
@@ -303,10 +303,10 @@ function clipLinePerspective(line, z_min) {
 
             if(outCode == out0) {
                 p0.values = [xt, yt, zt];
-                out0 = outcodeParallel(p0);
+                out0 = outcodePerspective(p0);
             } else {
                 p1.values = [xt, yt, zt];
-                out1 = outcodeParallel(p1);
+                out1 = outcodePerspective(p1);
             }
         }
     }
