@@ -85,7 +85,7 @@ function drawScene() {
         //for each model
         for(let i=0; i<scene.models.length; i++){ 
             //for each edge transform
-            for(let j=0; j<scene.models[i].edges.length-1; j++){ 
+            for(let j=0; j<scene.models[i].edges.length; j++){ 
                 for(let k=0; k<scene.models[i].edges[j].length-1; k++){ 
                     //need to get vertex at each index in the exges list and make lines for each pair
                     let p0Pointer = scene.models[i].vertices[scene.models[i].edges[j][k]];
@@ -93,7 +93,7 @@ function drawScene() {
 
                     let pt0 = Vector4(p0Pointer.x,p0Pointer.y,p0Pointer.z,p0Pointer.w);
                     let pt1 = Vector4(p1Pointer.x,p1Pointer.y,p1Pointer.z,p1Pointer.w); 
-                    console.log(pt0);
+                    //console.log(pt0);
 
                     //transform both points to canonical view volume
                     let tP0 = Matrix.multiply([nPer,pt0]);
@@ -338,6 +338,13 @@ function animate(timestamp) {
 }
 // Called when user presses a key on the keyboard down 
 function onKeyDown(event) {
+    let n = scene.view.prp.subtract(scene.view.srp);
+    n.normalize();
+    let u = scene.view.vup.cross(n);
+    u.normalize();
+    let v = n.cross(u);
+    v.normalize();
+
     switch (event.keyCode) {
         case 37: // LEFT Arrow
             console.log("left");
@@ -346,17 +353,41 @@ function onKeyDown(event) {
             console.log("right");
             break;
         case 65: // A key
-            console.log("A");
-            break;
+        //prp and srp left along the u axis
+        scene.view.prp = scene.view.prp.subtract(u);
+        scene.view.srp = scene.view.srp.subtract(u);
+        console.log("A");
+        //deletes previous frame
+        ctx.clearRect(0, 0, view.width, view.height);
+        drawScene();
+        break;
         case 68: // D key
-            console.log("D");
-            break;
+        //prp and srp right along u axis 
+        scene.view.prp = scene.view.prp.add(u);
+        scene.view.srp = scene.view.srp.add(u);
+        console.log("D");
+        //deletes previous frame
+        ctx.clearRect(0, 0, view.width, view.height);
+        drawScene();
+        break;
         case 83: // S key
-            console.log("S");
-            break;
+        //prp and srp back along n 
+        scene.view.prp = scene.view.prp.subtract(n);
+        scene.view.srp = scene.view.srp.subtract(n);
+        console.log("S");
+        //deletes previous frame
+        ctx.clearRect(0, 0, view.width, view.height);
+        drawScene();
+        break;
         case 87: // W key
-            console.log("W");
-            break;
+        //prp and srp up along n 
+        scene.view.prp = scene.view.prp.add(n);
+        scene.view.srp = scene.view.srp.add(n);
+        console.log("W");
+        //deletes previous frame
+        ctx.clearRect(0, 0, view.width, view.height);
+        drawScene();
+        break;
     }
 }
 
