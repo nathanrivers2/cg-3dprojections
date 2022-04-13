@@ -9,12 +9,11 @@ function mat4x4Parallel(prp, srp, vup, clip) {
     //Modify the given matrix to get "rotate VRC such that (u,v,n) align with (x,y,z)" matrix
     var rVRC = new Matrix(4, 4);
     Mat4x4RotateVRC(rVRC, prp, srp, vup);
-
     // 3. shear such that CW is on the z-axis
     //Center of window: (left+right)/2, (bottom+top)/2
-    var cw = new Vector3((clip[0] + clip[1])/2, (clip[2] + clip[3])/2, 0);
-    //DOP: CW - PRP
-    var dop = cw.subtract(prp);
+    var cw = new Vector3((clip[0] + clip[1])/2, (clip[2]+clip[3])/2, -clip[4]);
+    //DOP: CW
+    var dop = cw;
     //Modify the given matrix to get "shear such that CW is on the z-axis" matrix
     var shPar = new Matrix(4, 4);
     Mat4x4ShearXY(shPar, -dop.x/dop.z, -dop.y/dop.z);
