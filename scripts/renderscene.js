@@ -319,23 +319,58 @@ function clipLinePerspective(line, z_min) {
 
 
 //leave this alone for now
+function rotation(center, currenTheta, axis, vertices){
 
+}
 
 // Animation loop - repeatedly calls rendering code
 function animate(timestamp) {
     // step 1: calculate time (time since start)
     let time = timestamp - start_time;
-    
+
     // step 2: transform models based on time
     // TODO: implement this!
+    
+    //Clone the vertices
+    let vertices = scene.models[0].vertices.map(v => v);
+    
+    //Update vertices after apply rotation matrix
+    scene.models[0].vertices = vertices.map(v => Matrix.multiply([rotateAboutXAnimation(time, vertices), v]));
 
     // step 3: draw scene
+    ctx.clearRect(0, 0, view.width, view.height);
     drawScene();
 
     // step 4: request next animation frame (recursively calling same function)
     // (may want to leave commented out while debugging initially)
-    // window.requestAnimationFrame(animate);
+    window.requestAnimationFrame(animate);
 }
+
+function rotateAboutXAnimation(time, vertices) {
+    let len = vertices.length;
+    //Get the center vertex
+    let center = new Vector3();
+    vertices.map(v => {
+        center.x += v.x/len;
+        center.y += v.y/len;
+        center.z += v.z/len;
+    })
+    let currenTheta = 0.1*time/1000*Math.PI*2 % (Math.PI*2);
+    //Rotating matrices
+    let tCenter1 = new Matrix(4,4);
+    Mat4x4Translate(tCenter1, center.x, center.y, center.z);
+
+    let tCenter2 = new Matrix(4,4);
+    Mat4x4Translate(tCenter2, -center.x, -center.y, -center.z);
+
+    let rotateAboutX = new Matrix(4,4);
+    Mat4x4RotateX(rotateAboutX, currenTheta); 
+
+
+    return Matrix.multiply([tCenter1, rotateAboutX, tCenter2]);
+}
+
+
 // Called when user presses a key on the keyboard down 
 function onKeyDown(event) {
     let n = scene.view.prp.subtract(scene.view.srp);
