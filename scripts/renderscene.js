@@ -319,9 +319,6 @@ function clipLinePerspective(line, z_min) {
 
 
 //leave this alone for now
-function rotation(center, currenTheta, axis, vertices){
-
-}
 
 // Animation loop - repeatedly calls rendering code
 function animate(timestamp) {
