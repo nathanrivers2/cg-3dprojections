@@ -76,7 +76,7 @@ function drawScene() {
     //  * project to 2D
     //  * draw line
 
-    //for perspective 
+        //for perspective 
     if(scene.view.type == 'perspective'){ 
 
         let nPer = mat4x4Perspective(scene.view.prp, scene.view.srp, scene.view.vup, scene.view.clip);
@@ -161,6 +161,88 @@ function drawScene() {
             drawLine(edge.pt0.x,edge.pt0.y,edge.pt1.x,edge.pt1.y);
         }
 
+    }else if(scene.view.type == "parallel"){ 
+        let nPar = mat4x4Parallel(scene.view.prp, scene.view.srp, scene.view.vup, scene.view.clip);
+        let mPar= mat4x4MPar();
+        let edges = [];
+        //for each model
+        for(let i=0; i<scene.models.length; i++){ 
+            //for each edge transform
+            for(let j=0; j<scene.models[i].edges.length; j++){ 
+                for(let k=0; k<scene.models[i].edges[j].length-1; k++){ 
+                    //need to get vertex at each index in the exges list and make lines for each pair
+                    let p0Pointer = scene.models[i].vertices[scene.models[i].edges[j][k]];
+                    let p1Pointer = scene.models[i].vertices[scene.models[i].edges[j][k+1]]; 
+
+                    let pt0 = Vector4(p0Pointer.x,p0Pointer.y,p0Pointer.z,p0Pointer.w);
+                    let pt1 = Vector4(p1Pointer.x,p1Pointer.y,p1Pointer.z,p1Pointer.w); 
+                    //console.log(pt0);
+
+                    //transform both points to canonical view volume
+                    let tP0 = Matrix.multiply([nPar,pt0]);
+                    let tP1 = Matrix.multiply([nPar,pt1]);
+                   
+
+                    //create line for each set of points
+                    let line = {pt0: tP0, pt1:tP1}; 
+                    edges.push(line);
+                }
+            }
+        }
+        console.log(edges);
+
+        //for each edge, clip  
+        let clippedEdges = [];
+        for(let x=0; x<edges.length;x++){ 
+            let clipped = clipLineParallel(edges[x]); 
+
+            if(clipped != null){ 
+                clippedEdges.push(clipped);
+            }else{ 
+                clippedEdges.push(edges[x]);
+            }
+        }
+        console.log("clipped edges");
+        console.log(clippedEdges);
+
+        //multiply clipped edges by mPer and scale 
+        let V = new Matrix(4,4);
+        V.values= ([view.width/2, 0, 0, view.width/2,
+                0, view.height/2, 0, view.height/2,
+                0, 0, 1, 0,
+                0, 0, 0, 1]);
+
+        for(edge of clippedEdges){ //think this is how you do a for each loop
+                edge.pt0=Matrix.multiply([mPar,edge.pt0]);
+                edge.pt1=Matrix.multiply([mPar,edge.pt1]);
+        }
+
+
+        console.log(clippedEdges);
+
+        for(edge of clippedEdges){ //think this is how you do a for each loop
+                edge.pt0=Matrix.multiply([V,edge.pt0]);
+                edge.pt1=Matrix.multiply([V,edge.pt1]);
+        }
+        console.log("scaled");
+        console.log(clippedEdges);
+
+
+        //divide x and y by w
+        for(edge of clippedEdges){ //think this is how you do a for each loop
+            edge.pt0.x=(edge.pt0.x)/(edge.pt0.w);
+            edge.pt0.y=(edge.pt0.y)/(edge.pt0.w);
+            edge.pt1.x=(edge.pt1.x)/(edge.pt1.w);
+            edge.pt1.y=(edge.pt1.y)/(edge.pt1.w);
+        }
+
+        console.log("draiwng edges");
+        console.log(clippedEdges);
+
+        //then draw each edge
+        for(edge of clippedEdges){ //think this is how you do a for each loop
+            drawLine(edge.pt0.x,edge.pt0.y,edge.pt1.x,edge.pt1.y);
+        }
     }
 }
 
@@ -314,10 +396,6 @@ function clipLinePerspective(line, z_min) {
     return result;
 }
 
-
-
-
-
 //leave this alone for now
 
 // Animation loop - repeatedly calls rendering code
@@ -336,12 +414,14 @@ function animate(timestamp) {
 
     // step 3: draw scene
     ctx.clearRect(0, 0, view.width, view.height);
+
     drawScene();
 
     // step 4: request next animation frame (recursively calling same function)
     // (may want to leave commented out while debugging initially)
-    window.requestAnimationFrame(animate);
+    //window.requestAnimationFrame(animate);
 }
+
 
 function rotateAboutXAnimation(time, vertices) {
     let len = vertices.length;
