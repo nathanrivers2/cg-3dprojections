@@ -410,7 +410,8 @@ function animate(timestamp) {
     let vertices = scene.models[0].vertices.map(v => v);
     
     //Update vertices after apply rotation matrix
-    scene.models[0].vertices = vertices.map(v => Matrix.multiply([rotateAboutXAnimation(time, vertices), v]));
+    let mat = rotateAboutXAnimation(time, vertices);
+    scene.models[0].vertices = vertices.map(v => Matrix.multiply([mat, v]));
 
     // step 3: draw scene
     ctx.clearRect(0, 0, view.width, view.height);
@@ -432,7 +433,9 @@ function rotateAboutXAnimation(time, vertices) {
         center.y += v.y/len;
         center.z += v.z/len;
     })
-    let currenTheta = 0.1*time/1000*Math.PI*2 % (Math.PI*2);
+    // let theta = 0.01*time/1000%1;
+    let theta = 0.01;
+
     //Rotating matrices
     let tCenter1 = new Matrix(4,4);
     Mat4x4Translate(tCenter1, center.x, center.y, center.z);
@@ -441,7 +444,7 @@ function rotateAboutXAnimation(time, vertices) {
     Mat4x4Translate(tCenter2, -center.x, -center.y, -center.z);
 
     let rotateAboutX = new Matrix(4,4);
-    Mat4x4RotateX(rotateAboutX, currenTheta); 
+    Mat4x4RotateX(rotateAboutX, theta); 
 
 
     return Matrix.multiply([tCenter1, rotateAboutX, tCenter2]);
