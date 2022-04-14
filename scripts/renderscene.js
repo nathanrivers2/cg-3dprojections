@@ -24,7 +24,8 @@ function init() {
     // initial scene... feel free to change this
     scene = {
         view: {
-            type: 'perspective',
+            //type: 'perspective',
+            type: 'parallel',
             prp: Vector3(44, 20, -16),
             srp: Vector3(20, 20, -40),
             vup: Vector3(0, 1, 0),
@@ -123,11 +124,13 @@ function drawScene() {
         console.log(clippedEdges);
 
         //multiply clipped edges by mPer and scale 
-        let V = new Matrix(4,4);
-        V.values= ([view.width/2, 0, 0, view.width/2,
+        let v = new Matrix(4,4);
+        v.values= (
+                [view.width/2, 0, 0, view.width/2,
                 0, view.height/2, 0, view.height/2,
                 0, 0, 1, 0,
-                0, 0, 0, 1]);
+                0, 0, 0, 1]
+                );
 
         for(edge of clippedEdges){ //think this is how you do a for each loop
                 edge.pt0=Matrix.multiply([mPer,edge.pt0]);
@@ -138,8 +141,8 @@ function drawScene() {
         console.log(clippedEdges);
 
         for(edge of clippedEdges){ //think this is how you do a for each loop
-                edge.pt0=Matrix.multiply([V,edge.pt0]);
-                edge.pt1=Matrix.multiply([V,edge.pt1]);
+                edge.pt0=Matrix.multiply([v,edge.pt0]);
+                edge.pt1=Matrix.multiply([v,edge.pt1]);
         }
         console.log("scaled");
         console.log(clippedEdges);
@@ -206,23 +209,24 @@ function drawScene() {
         console.log(clippedEdges);
 
         //multiply clipped edges by mPer and scale 
-        let V = new Matrix(4,4);
-        V.values= ([view.width/2, 0, 0, view.width/2,
+        let v = new Matrix(4,4);
+        v.values= (
+                [view.width/2, 0, 0, view.width/2,
                 0, view.height/2, 0, view.height/2,
                 0, 0, 1, 0,
-                0, 0, 0, 1]);
+                0, 0, 0, 1]
+                );
 
         for(edge of clippedEdges){ //think this is how you do a for each loop
                 edge.pt0=Matrix.multiply([mPar,edge.pt0]);
                 edge.pt1=Matrix.multiply([mPar,edge.pt1]);
         }
 
-
         console.log(clippedEdges);
 
         for(edge of clippedEdges){ //think this is how you do a for each loop
-                edge.pt0=Matrix.multiply([V,edge.pt0]);
-                edge.pt1=Matrix.multiply([V,edge.pt1]);
+                edge.pt0=Matrix.multiply([v,edge.pt0]);
+                edge.pt1=Matrix.multiply([v,edge.pt1]);
         }
         console.log("scaled");
         console.log(clippedEdges);
@@ -420,7 +424,7 @@ function animate(timestamp) {
 
     // step 4: request next animation frame (recursively calling same function)
     // (may want to leave commented out while debugging initially)
-    //window.requestAnimationFrame(animate);
+    window.requestAnimationFrame(animate);
 }
 
 
