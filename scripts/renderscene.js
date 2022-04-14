@@ -55,6 +55,9 @@ function init() {
                     [3, 8],
                     [4, 9]
                 ],
+                animation: {
+                    rps: 0.25
+                },
                 matrix: new Matrix(4, 4)
             }
         ]
@@ -437,9 +440,8 @@ function rotateAboutXAnimation(time, vertices) {
         center.y += v.y/len;
         center.z += v.z/len;
     })
-    // let theta = 0.01*time/1000%1;
-    let theta = 0.01;
 
+    let theta = scene.models[0].animation.rps * time/1000 * Math.PI/180; // angle of rotation based on time
     //Rotating matrices
     let tCenter1 = new Matrix(4,4);
     Mat4x4Translate(tCenter1, center.x, center.y, center.z);
@@ -449,7 +451,6 @@ function rotateAboutXAnimation(time, vertices) {
 
     let rotateAboutX = new Matrix(4,4);
     Mat4x4RotateX(rotateAboutX, theta); 
-
 
     return Matrix.multiply([tCenter1, rotateAboutX, tCenter2]);
 }
