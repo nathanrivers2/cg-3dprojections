@@ -68,7 +68,7 @@ function init() {
     
     // start animation loop
     start_time = performance.now(); // current timestamp in milliseconds
-    window.requestAnimationFrame(animate);
+   // window.requestAnimationFrame(animate);
 }
 
 
